@@ -1,0 +1,13 @@
+{
+  "name": "hindley-milner-parser-js",
+  "description": "parse hindley milner signatures",
+  "version": "0.1.0",
+  "license": "MIT",
+  "main": "hm-parser.js",
+  "dependencies": {
+    "mona": "^0.9.1"
+  },
+  "devDependencies": {
+    "tape": "^4.6.3"
+  }
+}
