@@ -242,14 +242,18 @@ function wrappedUncurriedFn() {
   );
 }
 
+// order matters
+// if we are parsing 'x :: [a] -> Interger' and `list` were first
+// or would short circuit when it found '[a]' and the parser would
+// fail with 'unexpected end of input'
 function type(wrap) {
   return m.or(
-    m.delay(list),
     m.delay(wrap & WRAP_FN ? wrappedFn : fn),
-    m.delay(wrap & WRAP_CONSTRAINED_TYPE ? wrappedConstrainedType : constrainedType),
-    typevar(),
-    m.delay(wrap & WRAP_TYPE_CONSTRUCTOR ? wrappedTypeConstructor : typeConstructor),
     m.delay(wrap & WRAP_UC_FN ? wrappedUncurriedFn : uncurriedFunction),
+    m.delay(wrap & WRAP_TYPE_CONSTRUCTOR ? wrappedTypeConstructor : typeConstructor),
+    m.delay(wrap & WRAP_CONSTRAINED_TYPE ? wrappedConstrainedType : constrainedType),
+    m.delay(list),
+    typevar(),
     m.delay(record)
   );
 }

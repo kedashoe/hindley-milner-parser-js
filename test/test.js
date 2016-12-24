@@ -14,6 +14,17 @@ Tape.test('parse', t => {
   });
 
   t.deepEqual(
+    HMP.parse('x :: [a] -> Integer'), {
+      name: 'x',
+      constraints: [],
+      type:
+      {type: 'function', text: '', children: [
+        {type: 'list', text: '', children: [
+          {type: 'typevar', text: 'a', children: []}]},
+        {type: 'typeConstructor', text: 'Integer', children: []}]}
+    });
+
+  t.deepEqual(
     HMP.parse('hello :: a -> { x :: String, y :: a }'), {
       name: 'hello',
       constraints: [],
