@@ -39,14 +39,30 @@ Tape.test('parse', t => {
     });
 
   t.deepEqual(
+    HMP.parse('Maybe#chain :: Maybe a ~> (a -> Maybe b) -> Maybe b'), {
+      name: 'Maybe#chain',
+      constraints: [],
+      type:
+        {type: 'method', text: '', children: [
+          {type: 'typeConstructor', text: 'Maybe', children: [
+            {type: 'typevar', text: 'a', children:[]}]},
+          {type: 'function', text: '', children: [
+            {type: 'typevar', text: 'a', children: []},
+            {type: 'typeConstructor', text: 'Maybe', children: [
+              {type: 'typevar', text: 'b', children: []}]}]},
+          {type: 'typeConstructor', text: 'Maybe', children: [
+            {type: 'typevar', text: 'b', children: []}]}]}
+    });
+
+  t.deepEqual(
     HMP.parse('hello :: Foo a => a -> String'), {
       name: 'hello',
       constraints: [
         {typeclass: 'Foo', typevar: 'a'}],
       type:
-        {type: 'function', text: '', children: [
-          {type: 'typevar', text: 'a', children: []},
-          {type: 'typeConstructor', text: 'String', children: []}]}});
+      {type: 'function', text: '', children: [
+        {type: 'typevar', text: 'a', children: []},
+        {type: 'typeConstructor', text: 'String', children: []}]}});
 
   t.deepEqual(
     HMP.parse('reduce_ :: Foldable f => ((a, b) -> a) -> a -> f b -> a'), {

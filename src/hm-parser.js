@@ -250,6 +250,7 @@ function type(wrap) {
   return m.or(
     m.delay(wrap & WRAP_FN ? wrappedFn : fn),
     m.delay(wrap & WRAP_UC_FN ? wrappedUncurriedFn : uncurriedFunction),
+    m.delay(method),
     m.delay(wrap & WRAP_TYPE_CONSTRUCTOR ? wrappedTypeConstructor : typeConstructor),
     m.delay(wrap & WRAP_CONSTRAINED_TYPE ? wrappedConstrainedType : constrainedType),
     m.delay(list),
