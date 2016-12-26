@@ -101,6 +101,17 @@ Tape.test('parse', t => {
               {type: 'typevar', text: 'a', children: []}]},
             {type: 'typevar', text: 'b', children: []}]}]}]}});
 
+  t.deepEqual(
+    HMP.parse('sum :: Foldable f => f FiniteNumber -> FiniteNumber'), {
+      name: 'sum',
+      constraints: [
+        {typeclass: 'Foldable', typevar: 'f'}],
+      type:
+      {type: 'function', text: '', children: [
+        {type: 'constrainedType', text: 'f', children: [
+          {type: 'typeConstructor', text: 'FiniteNumber', children: []}]},
+        {type: 'typeConstructor', text: 'FiniteNumber', children: []}]}});
+
   t.end();
 });
 
@@ -138,6 +149,11 @@ Tape.test('constrainedType', t => {
   t.deepEqual(HMP.constrainedType('f a'),
     {type: 'constrainedType', text: 'f', children: [
       {type: 'typevar', text: 'a', children: []}]});
+
+  t.deepEqual(HMP.constrainedType('f Integer'),
+    {type: 'constrainedType', text: 'f', children: [
+      {type: 'typeConstructor', text: 'Integer', children: []}]});
+
   t.end();
 });
 

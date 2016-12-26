@@ -129,7 +129,10 @@ function constrainedType() {
       lowerWord(),
       m.and(
         m.spaces(),
-        type(WRAP_ALL)
+        m.or(
+          nullaryTypeConstructor(),
+          type(WRAP_ALL)
+        )
       )
     )
   );
