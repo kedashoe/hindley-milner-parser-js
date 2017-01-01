@@ -224,7 +224,7 @@ function uncurriedFunction() {
         m.string('('),
         m.string(')'),
         m.split(
-          type(WRAP_FNS),
+          type(),
           m.string(', '),
           { min: 2 }
         )
