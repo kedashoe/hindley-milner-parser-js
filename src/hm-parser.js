@@ -124,15 +124,18 @@ function typevar() {
 
 function constrainedType() {
   return m.map(
-    ([text, child]) => ({ type: 'constrainedType', text, children: [child] }),
+    ([text, children]) => ({ type: 'constrainedType', text, children }),
     m.join(
       lowerWord(),
-      m.and(
-        m.spaces(),
-        m.or(
-          nullaryTypeConstructor(),
-          type(WRAP_ALL)
-        )
+      m.collect(
+        m.and(
+          m.spaces(),
+          m.or(
+            nullaryTypeConstructor(),
+            type(WRAP_ALL)
+          )
+        ),
+        { min: 1 }
       )
     )
   );

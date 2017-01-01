@@ -112,6 +112,27 @@ Tape.test('parse', t => {
           {type: 'typeConstructor', text: 'FiniteNumber', children: []}]},
         {type: 'typeConstructor', text: 'FiniteNumber', children: []}]}});
 
+  t.deepEqual(
+    HMP.parse('promap :: Profunctor p => (a -> b, c -> d, p b c) -> p a d'), {
+      name: 'promap',
+      constraints: [
+        {typeclass: 'Profunctor', typevar: 'p'}],
+      type:
+      {type: 'uncurriedFunction', text: '', children: [
+        {type: 'parameters', text: '', children: [
+          {type: 'function', text: '', children: [
+            {type: 'typevar', text: 'a', children:[]},
+            {type: 'typevar', text: 'b', children:[]}]},
+          {type: 'function', text: '', children: [
+            {type: 'typevar', text: 'c', children:[]},
+            {type: 'typevar', text: 'd', children:[]}]},
+          {type: 'constrainedType', text: 'p', children: [
+            {type: 'typevar', text: 'b', children:[]},
+            {type: 'typevar', text: 'c', children:[]}]}]},
+        {type: 'constrainedType', text: 'p', children: [
+          {type: 'typevar', text: 'a', children:[]},
+          {type: 'typevar', text: 'd', children:[]}]}]}});
+
   t.end();
 });
 
@@ -149,6 +170,11 @@ Tape.test('constrainedType', t => {
   t.deepEqual(HMP.constrainedType('f a'),
     {type: 'constrainedType', text: 'f', children: [
       {type: 'typevar', text: 'a', children: []}]});
+
+  t.deepEqual(HMP.constrainedType('p a b'),
+    {type: 'constrainedType', text: 'p', children: [
+      {type: 'typevar', text: 'a', children: []},
+      {type: 'typevar', text: 'b', children: []}]});
 
   t.deepEqual(HMP.constrainedType('f Integer'),
     {type: 'constrainedType', text: 'f', children: [
