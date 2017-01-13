@@ -4,8 +4,9 @@ var WRAP_FN = 1;
 var WRAP_TYPE_CONSTRUCTOR = 2;
 var WRAP_CONSTRAINED_TYPE = 4;
 var WRAP_UC_FN = 8;
+var WRAP_THUNK = 8;
 
-var WRAP_FNS = WRAP_FN | WRAP_UC_FN;
+var WRAP_FNS = WRAP_FN | WRAP_UC_FN | WRAP_THUNK;
 var WRAP_ALL = WRAP_FNS | WRAP_TYPE_CONSTRUCTOR | WRAP_CONSTRAINED_TYPE;
 
 function upperWord() {
@@ -149,6 +150,27 @@ function wrappedConstrainedType() {
   );
 }
 
+function thunk() {
+  return m.map(
+    returnType => (
+      {type: 'function', text: '', children: [
+        {type: 'thunk', text: '', children: []},
+        returnType]}),
+    m.and(
+      m.string('() -> '),
+      type()
+    )
+  );
+}
+
+function wrappedThunk() {
+  return m.between(
+    m.string('('),
+    m.string(')'),
+    m.delay(thunk)
+  );
+}
+
 function fn() {
   return m.map(
     children => ({ type: 'function', text: '', children }),
@@ -256,6 +278,7 @@ function type(wrap) {
   return m.or(
     m.delay(wrap & WRAP_FN ? wrappedFn : fn),
     m.delay(wrap & WRAP_UC_FN ? wrappedUncurriedFn : uncurriedFunction),
+    m.delay(wrap & WRAP_THUNK ? wrappedThunk : thunk),
     m.delay(method),
     m.delay(wrap & WRAP_TYPE_CONSTRUCTOR ? wrappedTypeConstructor : typeConstructor),
     m.delay(wrap & WRAP_CONSTRAINED_TYPE ? wrappedConstrainedType : constrainedType),
@@ -299,6 +322,7 @@ var HMP = {
   'record': record,
   'method': method,
   'uncurriedFunction': uncurriedFunction,
+  'thunk': thunk,
   'type': type,
   'parse': parse,
 };

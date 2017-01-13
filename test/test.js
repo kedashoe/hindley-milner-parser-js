@@ -133,6 +133,22 @@ Tape.test('parse', t => {
           {type: 'typevar', text: 'a', children:[]},
           {type: 'typevar', text: 'd', children:[]}]}]}});
 
+  t.deepEqual(
+    HMP.parse('maybe_ :: (() -> b) -> (a -> b) -> Maybe a -> b'), {
+      name: 'maybe_',
+      constraints: [],
+      type:
+      {type: 'function', text: '', children: [
+        {type: 'function', text: '', children: [
+          {type: 'thunk', text: '', children: []},
+          {type: 'typevar', text: 'b', children: []}]},
+        {type: 'function', text: '', children: [
+          {type: 'typevar', text: 'a', children: []},
+          {type: 'typevar', text: 'b', children: []}]},
+        {type: 'typeConstructor', text: 'Maybe', children: [
+          {type: 'typevar', text: 'a', children: []}]},
+        {type: 'typevar', text: 'b', children: []}]}});
+
   t.end();
 });
 
@@ -163,6 +179,21 @@ Tape.test('classConstraints', t => {
 Tape.test('typevar', t => {
   t.deepEqual(HMP.typevar('a'),
     {type: 'typevar', text: 'a', children: []});
+  t.end();
+});
+
+Tape.test('thunk', t => {
+  t.deepEqual(HMP.thunk('() -> Maybe a'),
+    {type: 'function', text: '', children: [
+      {type: 'thunk', text: '', children: []},
+      {type: 'typeConstructor', text: 'Maybe', children: [
+        {type: 'typevar', text: 'a', children: []}]}]});
+
+  t.deepEqual(HMP.thunk('() -> a'),
+    {type: 'function', text: '', children: [
+      {type: 'thunk', text: '', children: []},
+      {type: 'typevar', text: 'a', children: []}]});
+
   t.end();
 });
 
