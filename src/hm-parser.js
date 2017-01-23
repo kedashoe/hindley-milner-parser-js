@@ -192,7 +192,7 @@ function wrappedFn() {
 
 function keyValue() {
   return m.map(
-    ([keyText, valueType]) => ({type: 'member', text: keyText, children: [valueType]}),
+    ([keyText, valueType]) => ({type: 'field', text: keyText, children: [valueType]}),
     m.join(
       m.followedBy(
         m.stringOf(

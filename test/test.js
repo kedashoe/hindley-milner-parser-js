@@ -32,9 +32,9 @@ Tape.test('parse', t => {
       {type: 'function', text: '', children: [
         {type: 'typevar', text: 'a', children: []},
         {type: 'record', text: '', children: [
-          {type: 'member', text: 'x', children: [
+          {type: 'field', text: 'x', children: [
             {type: 'typeConstructor', text: 'String', children: []}]},
-          {type: 'member', text: 'y', children: [
+          {type: 'field', text: 'y', children: [
             {type: 'typevar', text: 'a', children: []}]}]}]}
     });
 
@@ -217,16 +217,16 @@ Tape.test('constrainedType', t => {
 Tape.test('record', t => {
   t.deepEqual(HMP.record('{ foo :: Integer, bar :: Maybe [a] }'),
     {type: 'record', text: '', children: [
-      {type: 'member', text: 'foo', children: [
+      {type: 'field', text: 'foo', children: [
         {type: 'typeConstructor', text: 'Integer', children: []}]},
-      {type: 'member', text: 'bar', children: [
+      {type: 'field', text: 'bar', children: [
         {type: 'typeConstructor', text: 'Maybe', children: [
           {type: 'list', text: '', children: [
             {type: 'typevar', text: 'a', children: []}]}]}]}]});
 
   t.deepEqual(HMP.record('{ foo :: Integer }'),
     {type: 'record', text: '', children: [
-      {type: 'member', text: 'foo', children: [
+      {type: 'field', text: 'foo', children: [
         {type: 'typeConstructor', text: 'Integer', children: []}]}]});
 
   t.end();
