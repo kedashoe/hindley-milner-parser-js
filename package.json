@@ -1,7 +1,7 @@
 {
   "name": "hindley-milner-parser-js",
   "description": "parse hindley milner signatures",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "license": "MIT",
   "main": "hm-parser.js",
   "scripts": {
