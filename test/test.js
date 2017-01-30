@@ -1,5 +1,5 @@
 var Tape = require('tape');
-var HMP = require('../src/hm-parser.js');
+var HMP = require('../dist/hm-parser.js');
 
 Tape.test('parse', t => {
   t.deepEqual(

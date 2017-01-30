@@ -1,4 +1,16 @@
-XYZ = node_modules/.bin/xyz --repo git@github.com:owner/repo.git
+XYZ = node_modules/.bin/xyz
+BABEL = node_modules/.bin/babel
+
+SRC = src/hm-parser.js
+DST = dist/hm-parser.js
+
+all: $(DST)
+
+$(DST): $(SRC)
+	$(BABEL) $< -o $@
+
+test: all
+	node test/test.js
 
 .PHONY: release-major release-minor release-patch
 release-major release-minor release-patch:

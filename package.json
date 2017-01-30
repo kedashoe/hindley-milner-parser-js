@@ -11,6 +11,8 @@
     "mona": "^0.9.1"
   },
   "devDependencies": {
+    "babel-cli": "^6.22.2",
+    "babel-preset-latest": "^6.22.0",
     "tape": "^4.6.3",
     "xyz": "^2.1.0"
   }

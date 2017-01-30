@@ -1,6 +1,6 @@
 #!/bin/bash
 
-publish_dir=bin/hmjs-publish
+publish_dir=bin/.publish
 
 if ! grep -q '"name": "hindley-milner-parser-js"' package.json 2>/dev/null; then
   echo "error: please run from root of project"
@@ -11,7 +11,7 @@ files=(
   LICENSE
   README.md
   package.json
-  src/hm-parser.js
+  dist/hm-parser.js
 )
 
 rm -rf $publish_dir
