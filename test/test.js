@@ -1,195 +1,196 @@
 var Tape = require('tape');
-var HMP = require('../dist/hm-parser.js');
+var HMP = require('../dist/index.js');
+
+let run = (t, f) => (input, expected) => t.deepEqual(f(input), expected, input);
 
 Tape.test('parse', t => {
-  t.deepEqual(
-    HMP.parse('hello :: a -> Maybe a'), {
-      name: 'hello',
-      constraints: [],
-      type:
-        {type: 'function', text: '', children: [
-          {type: 'typevar', text: 'a', children: []},
-          {type: 'typeConstructor', text: 'Maybe', children: [
-            {type: 'typevar', text: 'a', children: []}]}]}
-  });
+  let r = run(t, HMP.parse);
 
-  t.deepEqual(
-    HMP.parse('x :: [a] -> Integer'), {
-      name: 'x',
-      constraints: [],
-      type:
-      {type: 'function', text: '', children: [
-        {type: 'list', text: '', children: [
-          {type: 'typevar', text: 'a', children: []}]},
-        {type: 'typeConstructor', text: 'Integer', children: []}]}
-    });
-
-  t.deepEqual(
-    HMP.parse('hello :: a -> { x :: String, y :: a }'), {
-      name: 'hello',
-      constraints: [],
-      type:
+  r('hello :: a -> Maybe a', {
+    name: 'hello',
+    constraints: [],
+    type:
       {type: 'function', text: '', children: [
         {type: 'typevar', text: 'a', children: []},
-        {type: 'record', text: '', children: [
-          {type: 'field', text: 'x', children: [
-            {type: 'typeConstructor', text: 'String', children: []}]},
-          {type: 'field', text: 'y', children: [
-            {type: 'typevar', text: 'a', children: []}]}]}]}
-    });
+        {type: 'typeConstructor', text: 'Maybe', children: [
+          {type: 'typevar', text: 'a', children: []}]}]}});
 
-  t.deepEqual(
-    HMP.parse('Maybe#chain :: Maybe a ~> (a -> Maybe b) -> Maybe b'), {
-      name: 'Maybe#chain',
-      constraints: [],
-      type:
-        {type: 'method', text: '', children: [
-          {type: 'typeConstructor', text: 'Maybe', children: [
-            {type: 'typevar', text: 'a', children:[]}]},
-          {type: 'function', text: '', children: [
-            {type: 'typevar', text: 'a', children: []},
-            {type: 'typeConstructor', text: 'Maybe', children: [
-              {type: 'typevar', text: 'b', children: []}]}]},
-          {type: 'typeConstructor', text: 'Maybe', children: [
-            {type: 'typevar', text: 'b', children: []}]}]}
-    });
+  r('x :: [a] -> Integer', {
+    name: 'x',
+    constraints: [],
+    type:
+    {type: 'function', text: '', children: [
+      {type: 'list', text: '', children: [
+        {type: 'typevar', text: 'a', children: []}]},
+      {type: 'typeConstructor', text: 'Integer', children: []}]}});
 
-  t.deepEqual(
-    HMP.parse('hello :: Foo a => a -> String'), {
-      name: 'hello',
-      constraints: [
-        {typeclass: 'Foo', typevar: 'a'}],
-      type:
+  r('hello :: a -> { x :: String, y :: a }', {
+    name: 'hello',
+    constraints: [],
+    type:
+    {type: 'function', text: '', children: [
+      {type: 'typevar', text: 'a', children: []},
+      {type: 'record', text: '', children: [
+        {type: 'field', text: 'x', children: [
+          {type: 'typeConstructor', text: 'String', children: []}]},
+        {type: 'field', text: 'y', children: [
+          {type: 'typevar', text: 'a', children: []}]}]}]}});
+
+  r('Maybe#chain :: Maybe a ~> (a -> Maybe b) -> Maybe b', {
+    name: 'Maybe#chain',
+    constraints: [],
+    type:
+    {type: 'method', text: '', children: [
+      {type: 'typeConstructor', text: 'Maybe', children: [
+        {type: 'typevar', text: 'a', children:[]}]},
       {type: 'function', text: '', children: [
         {type: 'typevar', text: 'a', children: []},
-        {type: 'typeConstructor', text: 'String', children: []}]}});
+        {type: 'typeConstructor', text: 'Maybe', children: [
+          {type: 'typevar', text: 'b', children: []}]}]},
+      {type: 'typeConstructor', text: 'Maybe', children: [
+        {type: 'typevar', text: 'b', children: []}]}]}});
 
-  t.deepEqual(
-    HMP.parse('reduce_ :: Foldable f => ((a, b) -> a) -> a -> f b -> a'), {
-      name: 'reduce_',
-      constraints: [
-        {typeclass: 'Foldable', typevar: 'f'}],
-      type:
-      {type: 'function', text: '', children: [
-        {type: 'uncurriedFunction', text: '', children: [
-          {type: 'parameters', text: '', children: [
-            {type: 'typevar', text: 'a', children: []},
-            {type: 'typevar', text: 'b', children: []}]},
-          {type: 'typevar', text: 'a', children: []}]},
-        {type: 'typevar', text: 'a', children: []},
-        {type: 'constrainedType', text: 'f', children: [
-          {type: 'typevar', text: 'b', children: []}]},
-        {type: 'typevar', text: 'a', children: []}]}});
+  r('hello :: Foo a => a -> String', {
+    name: 'hello',
+    constraints: [
+      {typeclass: 'Foo', typevar: 'a'}],
+    type:
+    {type: 'function', text: '', children: [
+      {type: 'typevar', text: 'a', children: []},
+      {type: 'typeConstructor', text: 'String', children: []}]}});
 
-  t.deepEqual(
-    HMP.parse('hello :: (Foo f, Bar a) => (a -> f b) -> [a] -> [Either (Maybe a) b]'), {
-      name: 'hello',
-      constraints: [
-        {typeclass: 'Foo', typevar: 'f'},
-        {typeclass: 'Bar', typevar: 'a'}],
-      type:
-      {type: 'function', text: '', children: [
-        {type: 'function', text: '', children: [
-          {type: 'typevar', text: 'a', children: []},
-          {type: 'constrainedType', text: 'f', children: [
-            {type: 'typevar', text: 'b', children: []}]}]},
-        {type: 'list', text: '', children: [
-          {type: 'typevar', text: 'a', children: []}]},
-        {type: 'list', text: '', children: [
-          {type: 'typeConstructor', text: 'Either', children: [
-            {type: 'typeConstructor', text: 'Maybe', children: [
-              {type: 'typevar', text: 'a', children: []}]},
-            {type: 'typevar', text: 'b', children: []}]}]}]}});
-
-  t.deepEqual(
-    HMP.parse('sum :: Foldable f => f FiniteNumber -> FiniteNumber'), {
-      name: 'sum',
-      constraints: [
-        {typeclass: 'Foldable', typevar: 'f'}],
-      type:
-      {type: 'function', text: '', children: [
-        {type: 'constrainedType', text: 'f', children: [
-          {type: 'typeConstructor', text: 'FiniteNumber', children: []}]},
-        {type: 'typeConstructor', text: 'FiniteNumber', children: []}]}});
-
-  t.deepEqual(
-    HMP.parse('promap :: Profunctor p => (a -> b, c -> d, p b c) -> p a d'), {
-      name: 'promap',
-      constraints: [
-        {typeclass: 'Profunctor', typevar: 'p'}],
-      type:
+  r('reduce_ :: Foldable f => ((a, b) -> a) -> a -> f b -> a', {
+    name: 'reduce_',
+    constraints: [
+      {typeclass: 'Foldable', typevar: 'f'}],
+    type:
+    {type: 'function', text: '', children: [
       {type: 'uncurriedFunction', text: '', children: [
         {type: 'parameters', text: '', children: [
-          {type: 'function', text: '', children: [
-            {type: 'typevar', text: 'a', children:[]},
-            {type: 'typevar', text: 'b', children:[]}]},
-          {type: 'function', text: '', children: [
-            {type: 'typevar', text: 'c', children:[]},
-            {type: 'typevar', text: 'd', children:[]}]},
-          {type: 'constrainedType', text: 'p', children: [
-            {type: 'typevar', text: 'b', children:[]},
-            {type: 'typevar', text: 'c', children:[]}]}]},
-        {type: 'constrainedType', text: 'p', children: [
-          {type: 'typevar', text: 'a', children:[]},
-          {type: 'typevar', text: 'd', children:[]}]}]}});
-
-  t.deepEqual(
-    HMP.parse('maybe_ :: (() -> b) -> (a -> b) -> Maybe a -> b'), {
-      name: 'maybe_',
-      constraints: [],
-      type:
-      {type: 'function', text: '', children: [
-        {type: 'function', text: '', children: [
-          {type: 'thunk', text: '', children: []},
-          {type: 'typevar', text: 'b', children: []}]},
-        {type: 'function', text: '', children: [
           {type: 'typevar', text: 'a', children: []},
           {type: 'typevar', text: 'b', children: []}]},
-        {type: 'typeConstructor', text: 'Maybe', children: [
-          {type: 'typevar', text: 'a', children: []}]},
-        {type: 'typevar', text: 'b', children: []}]}});
+        {type: 'typevar', text: 'a', children: []}]},
+      {type: 'typevar', text: 'a', children: []},
+      {type: 'constrainedType', text: 'f', children: [
+        {type: 'typevar', text: 'b', children: []}]},
+      {type: 'typevar', text: 'a', children: []}]}});
+
+  r('hello :: (Foo f, Bar a) => (a -> f b) -> [a] -> [Either (Maybe a) b]', {
+    name: 'hello',
+    constraints: [
+      {typeclass: 'Foo', typevar: 'f'},
+      {typeclass: 'Bar', typevar: 'a'}],
+    type:
+    {type: 'function', text: '', children: [
+      {type: 'function', text: '', children: [
+        {type: 'typevar', text: 'a', children: []},
+        {type: 'constrainedType', text: 'f', children: [
+          {type: 'typevar', text: 'b', children: []}]}]},
+      {type: 'list', text: '', children: [
+        {type: 'typevar', text: 'a', children: []}]},
+      {type: 'list', text: '', children: [
+        {type: 'typeConstructor', text: 'Either', children: [
+          {type: 'typeConstructor', text: 'Maybe', children: [
+            {type: 'typevar', text: 'a', children: []}]},
+          {type: 'typevar', text: 'b', children: []}]}]}]}});
+
+  r('sum :: Foldable f => f FiniteNumber -> FiniteNumber', {
+    name: 'sum',
+    constraints: [
+      {typeclass: 'Foldable', typevar: 'f'}],
+    type:
+    {type: 'function', text: '', children: [
+      {type: 'constrainedType', text: 'f', children: [
+        {type: 'typeConstructor', text: 'FiniteNumber', children: []}]},
+      {type: 'typeConstructor', text: 'FiniteNumber', children: []}]}});
+
+  r('promap :: Profunctor p => (a -> b, c -> d, p b c) -> p a d', {
+    name: 'promap',
+    constraints: [
+      {typeclass: 'Profunctor', typevar: 'p'}],
+    type:
+    {type: 'uncurriedFunction', text: '', children: [
+      {type: 'parameters', text: '', children: [
+        {type: 'function', text: '', children: [
+          {type: 'typevar', text: 'a', children:[]},
+          {type: 'typevar', text: 'b', children:[]}]},
+        {type: 'function', text: '', children: [
+          {type: 'typevar', text: 'c', children:[]},
+          {type: 'typevar', text: 'd', children:[]}]},
+        {type: 'constrainedType', text: 'p', children: [
+          {type: 'typevar', text: 'b', children:[]},
+          {type: 'typevar', text: 'c', children:[]}]}]},
+      {type: 'constrainedType', text: 'p', children: [
+        {type: 'typevar', text: 'a', children:[]},
+        {type: 'typevar', text: 'd', children:[]}]}]}});
+
+  r('maybe_ :: (() -> b) -> (a -> b) -> Maybe a -> b', {
+    name: 'maybe_',
+    constraints: [],
+    type:
+    {type: 'function', text: '', children: [
+      {type: 'function', text: '', children: [
+        {type: 'thunk', text: '', children: []},
+        {type: 'typevar', text: 'b', children: []}]},
+      {type: 'function', text: '', children: [
+        {type: 'typevar', text: 'a', children: []},
+        {type: 'typevar', text: 'b', children: []}]},
+      {type: 'typeConstructor', text: 'Maybe', children: [
+        {type: 'typevar', text: 'a', children: []}]},
+      {type: 'typevar', text: 'b', children: []}]}});
 
   t.end();
 });
 
 Tape.test('name', t => {
-  t.deepEqual(HMP.name('foo'), 'foo');
-  t.deepEqual(HMP.name('foo\''), 'foo\'');
-  t.deepEqual(HMP.name('Maybe#@@type'),'Maybe#@@type');
+  let r = run(t, HMP.name);
+
+  r('foo', 'foo');
+  r('foo\'', 'foo\'');
+  r('Maybe#@@type','Maybe#@@type');
 
   t.end();
 });
 
 Tape.test('classConstraints', t => {
-  t.deepEqual(HMP.classConstraints('(Eq a, Foo b, Bar b)'), [
+  let r = run(t, HMP.classConstraints);
+
+  r('(Eq a, Foo b, Bar b)', [
     {typeclass: 'Eq', typevar: 'a'},
     {typeclass: 'Foo', typevar: 'b'},
     {typeclass: 'Bar', typevar: 'b'}]);
 
-  t.deepEqual(HMP.classConstraints('(Eq a, Foo b)'), [
+  r('(Eq a, Foo b)', [
     {typeclass: 'Eq', typevar: 'a'},
     {typeclass: 'Foo', typevar: 'b'}]);
 
-  t.deepEqual(HMP.classConstraints('Eq a'), [
+  r('Eq a', [
     {typeclass: 'Eq', typevar: 'a'}]);
 
   t.end();
 });
 
 Tape.test('typevar', t => {
-  t.deepEqual(HMP.typevar('a'),
+  let r = run(t, HMP.typevar);
+
+  r('a',
     {type: 'typevar', text: 'a', children: []});
+  r('foo',
+    {type: 'typevar', text: 'foo', children: []});
+
   t.end();
 });
 
 Tape.test('thunk', t => {
-  t.deepEqual(HMP.thunk('() -> Maybe a'),
+  let r = run(t, HMP.thunk);
+
+  r('() -> Maybe a',
     {type: 'function', text: '', children: [
       {type: 'thunk', text: '', children: []},
       {type: 'typeConstructor', text: 'Maybe', children: [
         {type: 'typevar', text: 'a', children: []}]}]});
 
-  t.deepEqual(HMP.thunk('() -> a'),
+  r('() -> a',
     {type: 'function', text: '', children: [
       {type: 'thunk', text: '', children: []},
       {type: 'typevar', text: 'a', children: []}]});
@@ -198,16 +199,18 @@ Tape.test('thunk', t => {
 });
 
 Tape.test('constrainedType', t => {
-  t.deepEqual(HMP.constrainedType('f a'),
+  let r = run(t, HMP.constrainedType);
+
+  r('f a',
     {type: 'constrainedType', text: 'f', children: [
       {type: 'typevar', text: 'a', children: []}]});
 
-  t.deepEqual(HMP.constrainedType('p a b'),
+  r('p a b',
     {type: 'constrainedType', text: 'p', children: [
       {type: 'typevar', text: 'a', children: []},
       {type: 'typevar', text: 'b', children: []}]});
 
-  t.deepEqual(HMP.constrainedType('f Integer'),
+  r('f Integer',
     {type: 'constrainedType', text: 'f', children: [
       {type: 'typeConstructor', text: 'Integer', children: []}]});
 
@@ -215,7 +218,9 @@ Tape.test('constrainedType', t => {
 });
 
 Tape.test('record', t => {
-  t.deepEqual(HMP.record('{ foo :: Integer, bar :: Maybe [a] }'),
+  let r = run(t, HMP.record);
+
+  r('{ foo :: Integer, bar :: Maybe [a] }',
     {type: 'record', text: '', children: [
       {type: 'field', text: 'foo', children: [
         {type: 'typeConstructor', text: 'Integer', children: []}]},
@@ -224,7 +229,7 @@ Tape.test('record', t => {
           {type: 'list', text: '', children: [
             {type: 'typevar', text: 'a', children: []}]}]}]}]});
 
-  t.deepEqual(HMP.record('{ foo :: Integer }'),
+  r('{ foo :: Integer }',
     {type: 'record', text: '', children: [
       {type: 'field', text: 'foo', children: [
         {type: 'typeConstructor', text: 'Integer', children: []}]}]});
@@ -233,14 +238,16 @@ Tape.test('record', t => {
 });
 
 Tape.test('uncurriedFunction', t => {
-  t.deepEqual(HMP.uncurriedFunction('(a, b) -> Integer'),
+  let r = run(t, HMP.uncurriedFn);
+
+  r('(a, b) -> Integer',
     {type: 'uncurriedFunction', text: '', children: [
       {type: 'parameters', text: '', children: [
         {type: 'typevar', text: 'a', children: []},
         {type: 'typevar', text: 'b', children: []}]},
       {type: 'typeConstructor', text: 'Integer', children: []}]});
 
-  t.deepEqual(HMP.uncurriedFunction('(Bool, [a], Maybe a) -> Either String a'),
+  r('(Bool, [a], Maybe a) -> Either String a',
     {type: 'uncurriedFunction', text: '', children: [
       {type: 'parameters', text: '', children: [
         {type: 'typeConstructor', text: 'Bool', children: []},
@@ -256,12 +263,14 @@ Tape.test('uncurriedFunction', t => {
 });
 
 Tape.test('method', t => {
-  t.deepEqual(HMP.method('Foo ~> Integer'),
+  let r = run(t, HMP.method);
+
+  r('Foo ~> Integer',
     {type: 'method', text: '', children: [
       {type: 'typeConstructor', text: 'Foo', children: []},
       {type: 'typeConstructor', text: 'Integer', children: []}]});
 
-  t.deepEqual(HMP.method('Maybe a ~> b -> Boolean'),
+  r('Maybe a ~> b -> Boolean',
     {type: 'method', text: '', children: [
       {type: 'typeConstructor', text: 'Maybe', children: [
         {type: 'typevar', text: 'a', children: []}]},
@@ -272,7 +281,9 @@ Tape.test('method', t => {
 });
 
 Tape.test('function', t => {
-  t.deepEqual(HMP.fn('(a -> b) -> [a] -> [b]'),
+  let r = run(t, HMP.fn);
+
+  r('(a -> b) -> [a] -> [b]',
     {type: 'function', text: '', children: [
       {type: 'function', text: '', children: [
         {type: 'typevar', text: 'a', children: []},
@@ -282,7 +293,7 @@ Tape.test('function', t => {
       {type: 'list', text: '', children: [
         {type: 'typevar', text: 'b', children: []}]}]});
 
-  t.deepEqual(HMP.fn('(a -> b) -> a -> b'),
+  r('(a -> b) -> a -> b',
     {type: 'function', text: '', children: [
       {type: 'function', text: '', children: [
         {type: 'typevar', text: 'a', children: []},
@@ -290,46 +301,49 @@ Tape.test('function', t => {
       {type: 'typevar', text: 'a', children: []},
       {type: 'typevar', text: 'b', children: []}]});
 
-  t.deepEqual(HMP.fn('f a -> b'),
+  r('f a -> b',
     {type: 'function', text: '', children: [
       {type: 'constrainedType', text: 'f', children: [
         {type: 'typevar', text: 'a', children: []}]},
       {type: 'typevar', text: 'b', children: []}]});
 
-  t.deepEqual(HMP.fn('a -> Boolean'),
+  r('a -> Boolean',
     {type: 'function', text: '', children: [
       {type: 'typevar', text: 'a', children: []},
       {type: 'typeConstructor', text: 'Boolean', children: []}]});
 
-  t.deepEqual(HMP.fn('Maybe a -> a'),
+  r('Maybe a -> a',
     {type: 'function', text: '', children: [
       {type: 'typeConstructor', text: 'Maybe', children: [
         {type: 'typevar', text: 'a', children: []}]},
       {type: 'typevar', text: 'a', children: []}]});
 
-  t.deepEqual(HMP.fn('a -> b'),
+  r('a -> b',
     {type: 'function', text: '', children: [
       {type: 'typevar', text: 'a', children: []},
       {type: 'typevar', text: 'b', children: []}]});
+
   t.end();
 });
 
 Tape.test('list', t => {
-  t.deepEqual(HMP.list('[[Integer]]'),
+  let r = run(t, HMP.list);
+
+  r('[[Integer]]',
     {type: 'list', text: '', children: [
       {type: 'list', text: '', children: [
         {type: 'typeConstructor', text: 'Integer', children: []}]}]});
 
-  t.deepEqual(HMP.list('[a]'),
+  r('[a]',
     {type: 'list', text: '', children: [
       {type: 'typevar', text: 'a', children: []}]});
 
-  t.deepEqual(HMP.list('[Maybe a]'),
+  r('[Maybe a]',
     {type: 'list', text: '', children: [
       {type: 'typeConstructor', text: 'Maybe', children: [
         {type: 'typevar', text: 'a', children: []}]}]});
 
-  t.deepEqual(HMP.list('[a -> Bool]'),
+  r('[a -> Bool]',
     {type: 'list', text: '', children: [
       {type: 'function', text: '', children: [
         {type: 'typevar', text: 'a', children: []},
@@ -339,64 +353,67 @@ Tape.test('list', t => {
 });
 
 Tape.test('typeConstructor', t => {
-  t.deepEqual(HMP.typeConstructor('Maybe (Either a (Maybe b))'),
+  let r = run(t, HMP.typeConstructor);
+
+  r('Maybe (Either a (Maybe b))',
     {type: 'typeConstructor', text: 'Maybe', children: [
       {type: 'typeConstructor', text: 'Either', children: [
         {type: 'typevar', text: 'a', children: []},
         {type: 'typeConstructor', text: 'Maybe', children: [
           {type: 'typevar', text: 'b', children: []}]}]}]});
 
-  t.deepEqual(HMP.typeConstructor('Maybe (Either a b)'),
+  r('Maybe (Either a b)',
     {type: 'typeConstructor', text: 'Maybe', children: [
       {type: 'typeConstructor', text: 'Either', children: [
         {type: 'typevar', text: 'a', children: []},
         {type: 'typevar', text: 'b', children: []}]}]});
 
-  t.deepEqual(HMP.typeConstructor('Maybe (f a)'),
+  r('Maybe (f a)',
     {type: 'typeConstructor', text: 'Maybe', children: [
       {type: 'constrainedType', text: 'f', children: [
         {type: 'typevar', text: 'a', children: []}]}]});
 
-  t.deepEqual(HMP.typeConstructor('Maybe Integer'),
+  r('Maybe Integer',
     {type: 'typeConstructor', text: 'Maybe', children: [
       {type: 'typeConstructor', text: 'Integer', children: []}]});
 
-  t.deepEqual(HMP.typeConstructor('Either Integer Bool'),
+  r('Either Integer Bool',
     {type: 'typeConstructor', text: 'Either', children: [
       {type: 'typeConstructor', text: 'Integer', children: []},
       {type: 'typeConstructor', text: 'Bool', children: []}]});
 
-  t.deepEqual(HMP.typeConstructor('Triple a (Maybe Bool) Integer'),
+  r('Triple a (Maybe Bool) Integer',
     {type: 'typeConstructor', text: 'Triple', children: [
       {type: 'typevar', text: 'a', children: []},
       {type: 'typeConstructor', text: 'Maybe', children: [
         {type: 'typeConstructor', text: 'Bool', children: []}]},
       {type: 'typeConstructor', text: 'Integer', children: []}]});
 
-  t.deepEqual(HMP.typeConstructor('Either a (f b)'),
+  r('Either a (f b)',
     {type: 'typeConstructor', text: 'Either', children: [
       {type: 'typevar', text: 'a', children: []},
       {type: 'constrainedType', text: 'f', children: [
         {type: 'typevar', text: 'b', children: []}]}]});
 
-  t.deepEqual(HMP.typeConstructor('Either a b'),
+  r('Either a b',
     {type: 'typeConstructor', text: 'Either', children: [
       {type: 'typevar', text: 'a', children: []},
       {type: 'typevar', text: 'b', children: []}]});
 
-  t.deepEqual(HMP.typeConstructor('Maybe a'),
+  r('Maybe a',
     {type: 'typeConstructor', text: 'Maybe', children: [
       {type: 'typevar', text: 'a', children: []}]});
 
-  t.deepEqual(HMP.typeConstructor('A b'),
+  r('A b',
     {type: 'typeConstructor', text: 'A', children: [
       {type: 'typevar', text: 'b', children: []}]});
 
-  t.deepEqual(HMP.typeConstructor('Bool'),
+  r('Bool',
     {type: 'typeConstructor', text: 'Bool', children: []});
 
-  t.deepEqual(HMP.typeConstructor('A'),
+  r('A',
     {type: 'typeConstructor', text: 'A', children: []});
+
   t.end();
 });
 

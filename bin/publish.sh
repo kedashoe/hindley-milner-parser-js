@@ -11,7 +11,9 @@ files=(
   LICENSE
   README.md
   package.json
-  dist/hm-parser.js
+  dist/index.js
+  dist/grammar.js
+  dist/post-process.js
 )
 
 rm -rf $publish_dir

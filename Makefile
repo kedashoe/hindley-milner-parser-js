@@ -1,14 +1,16 @@
 XYZ = node_modules/.bin/xyz
 BABEL = node_modules/.bin/babel
+NEARLEY = node_modules/.bin/nearleyc
 
-SRC = src/hm-parser.js
-DST = dist/hm-parser.js
+all: dist/grammar.js dist/post-process.js dist/index.js
 
-all: $(DST)
+dist/grammar.js: src/grammar.ne src/util.ne
+	$(NEARLEY) $< > $@
 
-$(DST): $(SRC)
+dist/%.js: src/%.js
 	$(BABEL) $< -o $@
 
+.PHONY: test
 test: all
 	node test/test.js
 

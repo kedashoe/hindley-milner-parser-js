@@ -3,12 +3,12 @@
   "description": "parse hindley milner signatures",
   "version": "0.1.6",
   "license": "MIT",
-  "main": "hm-parser.js",
+  "main": "index.js",
   "scripts": {
     "test": "node test/test.js"
   },
   "dependencies": {
-    "mona": "^0.9.1"
+    "nearley": "^2.8.0"
   },
   "devDependencies": {
     "babel-cli": "^6.22.2",
