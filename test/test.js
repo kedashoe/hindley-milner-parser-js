@@ -417,3 +417,29 @@ Tape.test('typeConstructor', t => {
   t.end();
 });
 
+// these parse attempts fail with nil, but nearley does not throw
+// we throw when we get null back, which is what we are detecting here
+let nilError = (t, input) => (parser) => {
+  let expected = new RegExp(`Hindley Milner Parser: could not parse "${input}" as "${parser}"`);
+  t.throws(() => HMP[parser](input), expected, `nil error parsing "${input}" as "${parser}"`);
+};
+
+// these parse attempts fail with a thrown Error from nearley
+let throwError = (t, input) => (parser) => {
+  let expected = new RegExp(`nearley: No possible parsings`);
+  t.throws(() => HMP[parser](input), expected, `throw parsing "${input}" as "${parser}"`);
+};
+
+Tape.test('throws when input cannot be parsed', t => {
+  let nilTest = nilError(t, 'foo');
+  let throwTest = throwError(t, 'foo');
+
+  nilTest('parse');
+  nilTest('fn');
+
+  throwTest('method');
+  throwTest('typeConstructor');
+
+  t.end();
+});
+

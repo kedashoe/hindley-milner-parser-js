@@ -4,7 +4,13 @@ var grammar = require('./grammar.js');
 function parse(which, input) {
   let p = new nearley.Parser(grammar.ParserRules, which);
   p.feed(input);
-  return p.results[0];
+  let result = p.results[0];
+  if (result == null) {
+    throw new Error(`Hindley Milner Parser: could not parse "${input}" as "${which}"`);
+  }
+  else {
+    return result;
+  }
 }
 
 let parseNames = [
