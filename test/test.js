@@ -426,7 +426,7 @@ let nilError = (t, input) => (parser) => {
 
 // these parse attempts fail with a thrown Error from nearley
 let throwError = (t, input) => (parser) => {
-  let expected = new RegExp(`nearley: No possible parsings`);
+  let expected = new RegExp(`invalid syntax`);
   t.throws(() => HMP[parser](input), expected, `throw parsing "${input}" as "${parser}"`);
 };
 
